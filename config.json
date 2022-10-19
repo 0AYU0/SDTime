@@ -1,0 +1,47 @@
+{
+  "markers": {
+      "Priorities Start": {
+          "d": ["2022-02-12", "2022-02-21"],
+          "t": 8,
+          "c": "#e06d34",
+          "s": "True"
+      },
+      "Seniors Start" : {
+          "d": ["2022-02-12", "2022-02-21"],
+          "t": 12,
+          "c": "#42cf1b",
+          "s": "True"
+      },
+      "Juniors Start": {
+          "d": ["2022-02-15", "2022-02-23"],
+          "t": 8,
+          "c": "#11c7d1",
+          "s": "True"
+      },
+      "Sophomores Start": {
+          "d": ["2022-02-16", "2022-02-24"],
+          "t": 8,
+          "c": "#6a26d1",
+          "s": "True"
+      },
+      "Freshmen Start": {
+          "d": ["2022-02-17", "2022-02-25"],
+          "t": 8,
+          "c": "#e0e342",
+          "s": "True"
+      },
+      "End (FP/SP)": {
+          "d": ["2022-02-18", "2022-02-26"],
+          "t": 22,
+          "c": "#000000",
+          "s": "True"
+      }
+    },
+  "settings": {
+      "termName": "Spring 2022",
+      "isNormal": "True",
+      "showTotal": "True",
+      "useEnrolledTtl": "False",
+      "useMarkers": "True"
+  }
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <script src="https://d3js.org/d3.v7.min.js"></script>
+      <style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans&display=swap');</style>
+    </head>
+    <body>
+      <div id="my_dataviz"></div>
+      <script>
+      var configData = {
+  "markers": {
+      "Priorities Start": {
+          "d": ["2022-02-12", "2022-02-21"],
+          "t": 8,
+          "c": "#e06d34",
+          "s": "True"
+      },
+      "Seniors Start" : {
+          "d": ["2022-02-12", "2022-02-21"],
+          "t": 12,
+          "c": "#42cf1b",
+          "s": "True"
+      },
+      "Juniors Start": {
+          "d": ["2022-02-15", "2022-02-23"],
+          "t": 8,
+          "c": "#11c7d1",
+          "s": "True"
+      },
+      "Sophomores Start": {
+          "d": ["2022-02-16", "2022-02-24"],
+          "t": 8,
+          "c": "#6a26d1",
+          "s": "True"
+      },
+      "Freshmen Start": {
+          "d": ["2022-02-17", "2022-02-25"],
+          "t": 8,
+          "c": "#e0e342",
+          "s": "True"
+      },
+      "End (FP/SP)": {
+          "d": ["2022-02-18", "2022-02-26"],
+          "t": 22,
+          "c": "#000000",
+          "s": "True"
+      }
+    },
+  "settings": {
+      "termName": "Spring 2022",
+      "isNormal": "True",
+      "showTotal": "True",
+      "useEnrolledTtl": "False",
+      "useMarkers": "True"
+  }
+}; 
+      // set the dimensions and margins of the graph
+      var margin = {top: 20, right: 20, bottom: 50, left: 70},
+          width = 960 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+
+      // parse the date / time
+      var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S");
+
+      // set the ranges
+      var x = d3.scaleTime().range([0, width]);
+      var y = d3.scaleLinear().range([height, 0]);
+
+      // define the line
+      var enrolledLine = d3.line()
+          .x(d => x(d.time))
+          .y(d => y(d.enrolled))
+          .curve(d3.curveCatmullRom.alpha(.5));
+      var availableLine = d3.line()
+          .x(d => x(d.time))
+          .y(d => y(d.available))
+          .curve(d3.curveCatmullRom.alpha(.5));
+      
+      var waitlistedLine = d3.line()
+          .x(d => x(d.time))
+          .y(d => y(d.waitlisted))
+          .curve(d3.curveCatmullRom.alpha(.5));
+      var totalLine= d3.line()
+          .x(d => x(d.time))
+          .y(d => y(d.total))
+          .curve(d3.curveCatmullRom.alpha(.5));
+
+      // append the svg obgect to the body of the page
+      // appends a 'group' element to 'svg'
+      // moves the 'group' element to the top left margin
+      var svg = d3.select("body").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+      var legend = d3.select("body").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+      // Get the data
+      d3.csv("https://raw.githubusercontent.com/ewang2002/UCSDHistEnrollData/master/SP22/overall/CSE%2030.csv").then(function(data) {
+        // format the data
+        data.forEach(function(d) {
+            d.time = parseTime(d.time);
+            d.enrolled = parseInt(d.enrolled);
+            d.available = parseInt(d.available);
+            d.waitlisted = parseInt(d.waitlisted);
+            d.total = parseInt(d.total);
+        });
+        
+        var filteredData = data.filter((element, index) => {
+          return (index % 10 == 0); 
+        });
+        
+        var minimumDate = d3.min(data, function(d) {return d.time; });
+        console.log(minimumDate);
+        // Scale the range of the data
+        x.domain(d3.extent(data, d => d.time));
+        y.domain([0, d3.max(data, function(d) {return 1.25 * d.enrolled; })]);
+        // Add the valueline path.
+        svg.append("path")
+            .data([data])
+            .attr("d", enrolledLine)
+            .attr("stroke", "red")
+            .style("stroke-width", 1)
+            .attr("fill", "transparent");
+        svg.append("path")
+            .data([data])
+            .attr("d", availableLine)
+            .attr("stroke", "green")
+            .style("stroke-width", 1)
+            .attr("fill", "transparent");
+        svg.append("path")
+            .data([data])
+            .attr("d", waitlistedLine)
+            .attr("stroke", "blue")
+            .style("stroke-width", 1)
+            .attr("fill", "transparent");
+        svg.append("path")
+            .data([data])
+            .attr("d", totalLine)
+            .attr("stroke", "orange")
+            .style("stroke-width", 1)
+            .attr("fill", "transparent");
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+        svg.append("text")
+            .attr("class", "x label")
+            .attr("text-anchor", "end")
+            .attr("x", width)
+            .attr ("y", height + 32)
+            .style('font-family', '"DM Sans", sans-serif')
+            .text("Days Since Start of Enrollment");
+        svg.append("text")
+            .attr("class", "y label")
+            .attr("text-anchor", "end")
+            .attr("y", -48)
+            .attr("dy", ".75em")
+            .attr("transform", "rotate(-90)")
+            .style('font-family', '"DM Sans", sans-serif')
+            .text("Student Count");
+        configData['markets']
+  // Add the y Axis
+      svg.append("g")
+          .call(d3.axisLeft(y));
+      });
+        </script>
+    </body>
+</html>
